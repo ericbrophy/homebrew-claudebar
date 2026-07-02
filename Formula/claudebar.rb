@@ -1,9 +1,9 @@
 class Claudebar < Formula
   desc "macOS menu bar app for monitoring Claude Code usage limits"
   homepage "https://github.com/ericbrophy/claudebar"
-  version "0.2.1"
+  version "0.3.0"
   url "https://github.com/ericbrophy/homebrew-claudebar/releases/download/v#{version}/claudebar-#{version}-universal.tar.gz"
-  sha256 "27065509dfcd21a98becdd929e6da401d049f13676e07f8b7a338d50cbc58b21"
+  sha256 "451a65d0bf1daef0b9ec368f25b6aa45973c9d8701db0aac04c5657934ba9ff4"
   license "MIT"
 
   depends_on :macos
