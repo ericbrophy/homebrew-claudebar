@@ -1,30 +1,53 @@
 class Claudebar < Formula
   desc "macOS menu bar app for monitoring Claude Code usage limits"
   homepage "https://github.com/ericbrophy/claudebar"
-  version "0.3.2"
+  version "0.4.0"
   url "https://github.com/ericbrophy/homebrew-claudebar/releases/download/v#{version}/claudebar-#{version}-universal.tar.gz"
-  sha256 "cb103d8e53ffde69cd6376e6cd664e2680a4daa83758c8b1553732e6fa66c661"
+  sha256 "158933b92eda9b7ef035e63bdc84f6fcce00419e88df6520d503148a47387796"
   license "MIT"
 
   depends_on macos: :ventura
 
   def install
     libexec.install "ClaudeBar.app"
+    # GUI launches go through the stable opt symlink via LaunchServices (`open`)
+    # so the app runs as a proper bundle and SMAppService can present it as
+    # "ClaudeBar" in Login Items. The `--snapshot` CLI path must stay attached
+    # to stdout, so it execs the inner binary directly.
     (bin/"claudebar").write <<~SH
       #!/bin/bash
-      exec "#{libexec}/ClaudeBar.app/Contents/MacOS/ClaudeBar" "$@"
+      app="#{opt_libexec}/ClaudeBar.app"
+      if [ "$1" = "--snapshot" ]; then
+        exec "$app/Contents/MacOS/ClaudeBar" "$@"
+      fi
+      exec open "$app"
     SH
     (bin/"claudebar").chmod 0755
   end
 
-  service do
-    # Run the bundle's binary directly so macOS associates the running
-    # process with the .app — surfaces the app icon and display name in
-    # Activity Monitor, Force Quit, and Spotlight.
-    run [opt_libexec/"ClaudeBar.app/Contents/MacOS/ClaudeBar"]
-    keep_alive true
-    log_path var/"log/claudebar.log"
-    error_log_path var/"log/claudebar.log"
+  def caveats
+    s = <<~EOS
+      ClaudeBar runs from your menu bar. Launch it once to finish setup:
+        claudebar
+      (or: open #{opt_libexec}/ClaudeBar.app)
+
+      On first launch it asks whether to start at login; change this any time
+      in ClaudeBar -> Preferences. After a `brew upgrade`, open ClaudeBar once
+      so it refreshes its login-item registration.
+    EOS
+    legacy = "#{Dir.home}/Library/LaunchAgents/homebrew.mxcl.claudebar.plist"
+    if File.exist?(legacy)
+      s += <<~EOS
+
+        This version no longer uses `brew services`. Remove the old background
+        agent (the item that shows your developer name in Login Items):
+          brew services stop claudebar 2>/dev/null || true
+          launchctl bootout gui/$(id -u)/homebrew.mxcl.claudebar 2>/dev/null || \\
+            launchctl unload -w #{legacy} 2>/dev/null || true
+          rm -f #{legacy}
+      EOS
+    end
+    s
   end
 
   test do
