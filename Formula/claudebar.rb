@@ -6,7 +6,6 @@ class Claudebar < Formula
   sha256 "cb103d8e53ffde69cd6376e6cd664e2680a4daa83758c8b1553732e6fa66c661"
   license "MIT"
 
-  depends_on :macos
   depends_on macos: :ventura
 
   def install
