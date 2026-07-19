@@ -17,7 +17,7 @@ class Claudebar < Formula
     (bin/"claudebar").write <<~SH
       #!/bin/bash
       app="#{opt_libexec}/ClaudeBar.app"
-      if [ "$1" = "--snapshot" ]; then
+      if [ $# -gt 0 ]; then
         exec "$app/Contents/MacOS/ClaudeBar" "$@"
       fi
       exec open "$app"
