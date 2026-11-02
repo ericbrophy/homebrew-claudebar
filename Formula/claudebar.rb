@@ -3,7 +3,7 @@ class Claudebar < Formula
   homepage "https://github.com/ericbrophy/claudebar"
   version "0.8.2"
   url "https://github.com/ericbrophy/homebrew-claudebar/releases/download/v#{version}/claudebar-#{version}-universal.tar.gz"
-  sha256 "a2dbd41b0d6cf4e09fa16152249592d91ec2c3478629e80094204f8e022c806d"
+  sha256 "bcc599b5cff47bef5f5fcadb1c988dda672e71d1ab26436cbd254982372f9191"
   license "MIT"
 
   depends_on macos: :ventura
